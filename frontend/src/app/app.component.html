@@ -1,0 +1,91 @@
+<header class="topbar">
+  <div class="brand-mark">EMS</div>
+  <div>
+    <h1>Employee Management System</h1>
+    <p>Manage employee records in one place</p>
+  </div>
+</header>
+
+<main class="container">
+  <section class="stats">
+    <div class="stat-card"><span>Total employees</span><strong>{{ employees.length }}</strong></div>
+    <div class="stat-card"><span>Departments</span><strong>{{ departmentCount }}</strong></div>
+    <div class="stat-card"><span>Visible records</span><strong>{{ filteredEmployees.length }}</strong></div>
+  </section>
+
+  <section class="panel">
+    <div class="section-heading">
+      <div>
+        <h2>{{ editingId === null ? 'Add employee' : 'Edit employee' }}</h2>
+        <p>Enter the employee details below.</p>
+      </div>
+      <span class="pill">{{ editingId === null ? 'CREATE' : 'UPDATE' }}</span>
+    </div>
+
+    <div class="alert error" *ngIf="errorMessage" role="alert">{{ errorMessage }}</div>
+    <div class="alert success" *ngIf="successMessage" role="status">{{ successMessage }}</div>
+
+    <form #employeeForm="ngForm" (ngSubmit)="submit(employeeForm)" class="employee-form">
+      <label>First name
+        <input name="firstName" [(ngModel)]="formEmployee.firstName" required maxlength="80" #firstName="ngModel">
+        <small class="field-error" *ngIf="firstName.invalid && firstName.touched">First name is required.</small>
+      </label>
+      <label>Last name
+        <input name="lastName" [(ngModel)]="formEmployee.lastName" required maxlength="80" #lastName="ngModel">
+        <small class="field-error" *ngIf="lastName.invalid && lastName.touched">Last name is required.</small>
+      </label>
+      <label>Email address
+        <input type="email" name="email" [(ngModel)]="formEmployee.email" required email maxlength="160" #email="ngModel">
+        <small class="field-error" *ngIf="email.invalid && email.touched">Enter a valid email address.</small>
+      </label>
+      <label>Department
+        <input name="department" [(ngModel)]="formEmployee.department" required maxlength="100">
+      </label>
+      <label>Job title
+        <input name="jobTitle" [(ngModel)]="formEmployee.jobTitle" required maxlength="100">
+      </label>
+      <label>Salary
+        <input type="number" name="salary" [(ngModel)]="formEmployee.salary" required min="0" step="0.01">
+      </label>
+      <div class="form-actions">
+        <button class="primary" type="submit">{{ editingId === null ? 'Add employee' : 'Save changes' }}</button>
+        <button class="secondary" type="button" (click)="resetForm(employeeForm)">Clear</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="panel">
+    <div class="section-heading list-heading">
+      <div>
+        <h2>Employee directory</h2>
+        <p>Search, edit, or remove employee records.</p>
+      </div>
+      <input class="search" aria-label="Search employees" placeholder="Search employees..." [(ngModel)]="searchText" name="searchText">
+    </div>
+
+    <div class="loading" *ngIf="loading">Loading employees…</div>
+    <div class="table-wrap" *ngIf="!loading">
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Email</th><th>Department</th><th>Job title</th><th>Salary</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let employee of filteredEmployees">
+            <td><strong>{{ employee.firstName }} {{ employee.lastName }}</strong><small class="employee-id">ID: {{ employee.id }}</small></td>
+            <td>{{ employee.email }}</td>
+            <td><span class="department">{{ employee.department }}</span></td>
+            <td>{{ employee.jobTitle }}</td>
+            <td>{{ employee.salary | currency:'INR':'symbol':'1.2-2' }}</td>
+            <td class="actions">
+              <button type="button" class="edit" (click)="edit(employee)">Edit</button>
+              <button type="button" class="delete" (click)="delete(employee)">Delete</button>
+            </td>
+          </tr>
+          <tr *ngIf="filteredEmployees.length === 0"><td colspan="6" class="empty">No employees found. Add an employee or change your search.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>Employee Management System · Angular + Spring Boot + MySQL</footer>
+</main>
